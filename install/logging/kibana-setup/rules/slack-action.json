@@ -1,0 +1,8 @@
+[
+  {
+    "id": "__CONNECTOR__",
+    "group": "query matched",
+    "params": { "message": "{{rule.name}} ({{alert.id}}): {{context.message}}" },
+    "frequency": { "summary": false, "notify_when": "onActionGroupChange", "throttle": null }
+  }
+]

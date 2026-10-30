@@ -1,0 +1,48 @@
+# Log collection for the Replaice Desk server. Placed next to docker-compose.yml in /opt/replaicedesk,
+# where `docker compose` merges it automatically (deploy.sh keeps it across redeploys).
+#
+# 1. Every container logs with the container name attached (tag) and rotated files (max 5 x 50 MB).
+# 2. Fluent Bit reads those files and ships them to Elasticsearch as project replaicedesk.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    tag: "{{.Name}}"
+    max-size: "50m"
+    max-file: "5"
+
+services:
+  app:
+    logging: *logging
+  db:
+    logging: *logging
+  redis:
+    logging: *logging
+  caddy:
+    logging: *logging
+
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:5.1.3
+    container_name: replaicedesk_fluent_bit    # must contain "fluent_bit": its own logs are skipped by name
+    restart: unless-stopped
+    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/conf/fluent-bit.conf"]
+    environment:
+      # Identity of this host on every log line
+      LOG_PROJECT: replaicedesk
+      LOG_CLUSTER: replaicedesk-prod-ec2
+      LOG_ENV: prod
+      LOG_HOST: ec2-desk
+      # Replaice Desk's app logs key=value; the other containers are parsed as JSON or kept as text
+      LOGFMT_CONTAINERS: ^libredesk_app$
+      ES_HOST: <ES_PRIVATE_DNS>
+      # fluentbit-replaicedesk's password, written to .env (root-only) from the secret manager
+      ES_PASSWORD: ${FLUENTBIT_ES_PASSWORD:?set FLUENTBIT_ES_PASSWORD in .env}
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./fluent-bit:/fluent-bit/etc/conf:ro
+      - fluent-bit-buffer:/buffer
+    logging: *logging
+    networks: [desk]
+
+volumes:
+  fluent-bit-buffer:

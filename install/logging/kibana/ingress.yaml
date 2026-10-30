@@ -1,0 +1,29 @@
+# Public HTTPS entry for Kibana through ingress-nginx, certificate from cert-manager (Let's Encrypt),
+# the same way Prometheus is exposed. Users log in with Kibana's own login; the oauth2-proxy
+# annotations add company SSO in front once an oauth2-proxy is available.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kibana
+  namespace: logging
+  annotations:
+    cert-manager.io/cluster-issuer: <CLUSTER_ISSUER>
+    # nginx.ingress.kubernetes.io/auth-url: https://<OAUTH2_PROXY_HOST>/oauth2/auth
+    # nginx.ingress.kubernetes.io/auth-signin: https://<OAUTH2_PROXY_HOST>/oauth2/start?rd=$scheme://$host$escaped_request_uri
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - <KIBANA_HOST>
+      secretName: kibana-tls
+  rules:
+    - host: <KIBANA_HOST>
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: logs-kb-http     # created by ECK for the Kibana resource "logs"
+                port:
+                  number: 5601

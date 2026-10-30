@@ -1,0 +1,46 @@
+# Deploys Fluent Bit to every cluster that has a file integrations/<project>/clusters/<cluster>.yaml.
+# Onboarding a cluster = register it in ArgoCD under the same name + add that file. No change here.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: fluent-bit
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: <REPO_URL>
+        revision: main
+        files:
+          - path: integrations/*/clusters/*.yaml
+          - path: integrations/_template/**
+            exclude: true
+  template:
+    metadata:
+      name: 'fluent-bit-{{ .identity.cluster }}'
+      labels:
+        project: '{{ .identity.project }}'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://fluent.github.io/helm-charts
+          chart: fluent-bit
+          targetRevision: 0.58.3
+          helm:
+            releaseName: fluent-bit
+            valueFiles:
+              - $values/install/logging/fluent-bit/values-base.yaml
+              - '$values/{{ .path.path }}/{{ .path.filename }}'
+        - repoURL: <REPO_URL>
+          targetRevision: main
+          ref: values
+      destination:
+        name: '{{ .identity.cluster }}'          # the cluster's name as registered in ArgoCD
+        namespace: logging
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

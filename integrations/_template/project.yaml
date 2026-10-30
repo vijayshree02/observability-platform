@@ -1,0 +1,4 @@
+# Copy integrations/_template/ to integrations/<project>/ to onboard a project.
+project: myproject            # lowercase letters and digits only; logs go to data stream logs-<project>
+display_name: My Project      # name shown in Kibana, Grafana and the Replaice Desk System log page
+retention: 10d                # how long logs are kept; change at any time, then run es-setup/apply.sh

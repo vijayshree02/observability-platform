@@ -1,0 +1,9 @@
+{
+  "description": "Fluent Bit for project __PROJECT__: append to its own data stream only, cannot read or delete.",
+  "indices": [
+    {
+      "names": ["logs-__PROJECT__"],
+      "privileges": ["create_doc", "auto_configure"]
+    }
+  ]
+}

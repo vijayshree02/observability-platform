@@ -1,0 +1,19 @@
+# Values for the ECK operator Helm chart.
+# Install:
+#   helm repo add elastic https://helm.elastic.co && helm repo update
+#   helm install elastic-operator elastic/eck-operator --version 3.5.0 \
+#     -n elastic-system --create-namespace -f install/logging/eck-operator-values.yaml
+
+# The operator only watches the logging namespace.
+managedNamespaces:
+  - logging
+
+installCRDs: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 150Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi

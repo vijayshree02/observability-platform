@@ -46,20 +46,25 @@ stay as fields and are searched.
 
 ## Indices and retention
 
-- Index name: `logs-<project>-YYYY.MM.DD` (Fluent Bit `Logstash_Format On`, `Logstash_Prefix logs-<project>`).
-- One index template for `logs-*` holds the shared field mapping.
-- One ILM policy per retention class (`logs-14d`, `logs-30d`, `logs-90d`); each project picks one in its
-  `project.yaml`. Default 30 days.
+- One data stream per project: `logs-<project>`, e.g. `logs-tribe` (Fluent Bit `Index logs-<project>`,
+  `Write_Operation create`). Elasticsearch rolls it over and deletes old data by itself.
+- Project names are lowercase letters and digits only (no `-`), so `logs-<project>` never matches
+  Elasticsearch's built-in `logs-*-*` templates.
+- One index template, `logs-platform` (pattern `logs-*`, priority 500), holds the shared field mapping.
+- Each project is configured in `integrations/<project>/project.yaml` (`project`, `display_name`,
+  `retention`); the setup scripts read it.
+- Retention is set per data stream (`data_retention`). Default 10 days; any project can have its own, and it
+  can be changed at any time with `install/logging/es-setup/apply.sh <project>:<days>d`.
 - Daily snapshots to S3.
 
 ## Access
 
 | Principal | Rights |
 | --- | --- |
-| Fluent Bit (per project) | write to `logs-<project>-*` only |
-| Grafana | read `logs-*` |
-| Replaice Desk System log page | read `logs-*` (or the projects it should show) |
-| Project teams in Kibana | read their own `logs-<project>-*` |
+| Fluent Bit (per project) | append to `logs-<project>` only (`logs_writer_<project>`) |
+| Grafana | read `logs-*` (`logs_reader`) |
+| Replaice Desk System log page | read `logs-*` and `observability-projects` (`logs_reader`) |
+| Project teams in Kibana | read their own `logs-<project>` (`logs_viewer_<project>`) |
 
 ## Secrets
 

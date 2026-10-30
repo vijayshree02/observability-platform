@@ -1,0 +1,48 @@
+{
+  "uid": "logs-error-spike",
+  "title": "Log error spike",
+  "folderUID": "logs",
+  "ruleGroup": "logs",
+  "orgID": 1,
+  "condition": "C",
+  "for": "0s",
+  "noDataState": "OK",
+  "execErrState": "Error",
+  "labels": { "source": "logs" },
+  "annotations": {
+    "summary": "{{ $labels.project }} / {{ $labels.service }}: {{ $values.B }} errors in 5 minutes",
+    "description": "More than __THRESHOLD__ error or fatal log lines from one service in 5 minutes. Open the Logs overview dashboard (project {{ $labels.project }}, service {{ $labels.service }}) for the lines."
+  },
+  "data": [
+    {
+      "refId": "A",
+      "relativeTimeRange": { "from": 300, "to": 0 },
+      "datasourceUid": "logs-elasticsearch",
+      "model": {
+        "refId": "A",
+        "query": "level:(error OR fatal)",
+        "timeField": "@timestamp",
+        "metrics": [{ "id": "1", "type": "count" }],
+        "bucketAggs": [
+          { "id": "2", "type": "terms", "field": "project", "settings": { "min_doc_count": "1", "order": "desc", "orderBy": "_count", "size": "50" } },
+          { "id": "3", "type": "terms", "field": "service", "settings": { "min_doc_count": "1", "order": "desc", "orderBy": "_count", "size": "200" } },
+          { "id": "4", "type": "date_histogram", "field": "@timestamp", "settings": { "interval": "1m", "min_doc_count": "0" } }
+        ],
+        "intervalMs": 60000,
+        "maxDataPoints": 43200
+      }
+    },
+    {
+      "refId": "B",
+      "relativeTimeRange": { "from": 300, "to": 0 },
+      "datasourceUid": "__expr__",
+      "model": { "refId": "B", "type": "reduce", "expression": "A", "reducer": "sum", "settings": { "mode": "dropNN" } }
+    },
+    {
+      "refId": "C",
+      "relativeTimeRange": { "from": 300, "to": 0 },
+      "datasourceUid": "__expr__",
+      "model": { "refId": "C", "type": "threshold", "expression": "B", "conditions": [{ "evaluator": { "type": "gt", "params": [__THRESHOLD__] } }] }
+    }
+  ]
+}

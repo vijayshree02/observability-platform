@@ -1,0 +1,22 @@
+{
+  "name": "__NAME__: error spike",
+  "tags": ["logs", "__PROJECT__"],
+  "schedule": { "interval": "1m" },
+  "params": {
+    "searchType": "esQuery",
+    "index": ["logs-__PROJECT__"],
+    "timeField": "@timestamp",
+    "esQuery": "{\"query\":{\"terms\":{\"level\":[\"error\",\"fatal\"]}}}",
+    "size": 0,
+    "aggType": "count",
+    "groupBy": "top",
+    "termField": "service",
+    "termSize": 50,
+    "threshold": [__THRESHOLD__],
+    "thresholdComparator": ">",
+    "timeWindowSize": 5,
+    "timeWindowUnit": "m",
+    "excludeHitsFromPreviousRun": false
+  },
+  "actions": __ACTIONS__
+}

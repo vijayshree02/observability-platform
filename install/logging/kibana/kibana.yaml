@@ -1,0 +1,27 @@
+# Kibana for searching and analysing logs. TLS is terminated at the ingress (ingress.yaml).
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: logs
+  namespace: logging
+spec:
+  version: 9.5.5
+  count: 1
+  elasticsearchRef:
+    name: logs
+  config:
+    server.publicBaseUrl: https://<KIBANA_HOST>
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  podTemplate:
+    spec:
+      containers:
+        - name: kibana
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              memory: 1Gi

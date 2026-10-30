@@ -1,0 +1,5 @@
+# Namespace for Elasticsearch and Kibana. The ECK operator itself runs in elastic-system.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logging

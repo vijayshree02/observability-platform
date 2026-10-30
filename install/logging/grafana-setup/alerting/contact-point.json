@@ -1,0 +1,11 @@
+{
+  "uid": "logs-slack",
+  "name": "logs-slack",
+  "type": "slack",
+  "settings": {
+    "url": "__SLACK_WEBHOOK_URL__",
+    "title": "{{ template \"slack.default.title\" . }}",
+    "text": "{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}\n{{ end }}"
+  },
+  "disableResolveMessage": false
+}

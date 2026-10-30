@@ -1,0 +1,18 @@
+{
+  "description": "Grafana and the Replaice Desk System log page: read every project's logs and the project registry, cannot write.",
+  "cluster": [
+    "monitor"
+  ],
+  "indices": [
+    {
+      "names": [
+        "logs-*",
+        "observability-projects"
+      ],
+      "privileges": [
+        "read",
+        "view_index_metadata"
+      ]
+    }
+  ]
+}

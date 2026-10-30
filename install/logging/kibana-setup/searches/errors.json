@@ -1,0 +1,18 @@
+{
+  "attributes": {
+    "title": "__NAME__: errors",
+    "description": "Error and fatal log lines of __NAME__, newest first, from every cluster and service.",
+    "columns": ["cluster", "service", "kubernetes.pod_name", "level", "message"],
+    "sort": [["@timestamp", "desc"]],
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"query\":\"level:(error or fatal)\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "logs-__PROJECT__"
+    }
+  ]
+}

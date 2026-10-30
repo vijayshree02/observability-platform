@@ -1,0 +1,117 @@
+{
+  "index_patterns": [
+    "logs-*"
+  ],
+  "data_stream": {},
+  "priority": 500,
+  "_meta": {
+    "description": "Shared mapping for every project's log data stream logs-<project>. Priority 500 overrides Elasticsearch's built-in logs templates (priority 100-200).",
+    "managed_by": "observability-platform/install/logging/es-setup"
+  },
+  "template": {
+    "lifecycle": {
+      "data_retention": "__RETENTION__"
+    },
+    "data_stream_options": {
+      "failure_store": {
+        "enabled": true
+      }
+    },
+    "settings": {
+      "index": {
+        "number_of_shards": 1,
+        "number_of_replicas": 1,
+        "codec": "best_compression",
+        "mapping": {
+          "total_fields": {
+            "limit": 2000,
+            "ignore_dynamic_beyond_limit": true
+          },
+          "ignore_malformed": true
+        },
+        "default_pipeline": "logs-platform"
+      }
+    },
+    "mappings": {
+      "dynamic_templates": [
+        {
+          "kubernetes_labels": {
+            "path_match": "kubernetes.labels.*",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        },
+        {
+          "strings_as_keyword": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword",
+              "ignore_above": 1024
+            }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "project": {
+          "type": "keyword"
+        },
+        "cluster": {
+          "type": "keyword"
+        },
+        "env": {
+          "type": "keyword"
+        },
+        "host": {
+          "type": "keyword"
+        },
+        "level": {
+          "type": "keyword"
+        },
+        "service": {
+          "type": "keyword"
+        },
+        "request_id": {
+          "type": "keyword"
+        },
+        "caller": {
+          "type": "keyword"
+        },
+        "message": {
+          "type": "match_only_text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 512
+            }
+          }
+        },
+        "error": {
+          "type": "match_only_text"
+        },
+        "log": {
+          "type": "match_only_text"
+        },
+        "kubernetes": {
+          "properties": {
+            "namespace_name": {
+              "type": "keyword"
+            },
+            "pod_name": {
+              "type": "keyword"
+            },
+            "container_name": {
+              "type": "keyword"
+            },
+            "host": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

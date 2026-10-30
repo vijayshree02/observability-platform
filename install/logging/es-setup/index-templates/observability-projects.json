@@ -1,0 +1,13 @@
+{
+  "settings": { "number_of_shards": 1, "number_of_replicas": 1 },
+  "mappings": {
+    "_meta": { "description": "One document per onboarded project, written by es-setup/apply.sh from integrations/<project>/project.yaml." },
+    "dynamic": "strict",
+    "properties": {
+      "project":      { "type": "keyword" },
+      "display_name": { "type": "keyword" },
+      "data_stream":  { "type": "keyword" },
+      "retention":    { "type": "keyword" }
+    }
+  }
+}

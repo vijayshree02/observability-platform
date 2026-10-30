@@ -1,0 +1,9 @@
+{
+  "override": true,
+  "data_view": {
+    "id": "__ID__",
+    "title": "__TITLE__",
+    "name": "__NAME__",
+    "timeFieldName": "@timestamp"
+  }
+}

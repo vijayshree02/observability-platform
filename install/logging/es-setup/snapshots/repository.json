@@ -1,0 +1,7 @@
+{
+  "type": "s3",
+  "settings": {
+    "bucket": "__SNAPSHOT_BUCKET__",
+    "base_path": "logs-snapshots"
+  }
+}

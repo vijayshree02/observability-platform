@@ -1,0 +1,13 @@
+# gp3 EBS volumes that can be grown in place: raise `storage` in elasticsearch.yaml and re-apply.
+# Needs the EBS CSI driver add-on on the EKS cluster.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: es-gp3
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  encrypted: "true"
+allowVolumeExpansion: true
+reclaimPolicy: Retain                  # keep the data if the Elasticsearch resource is deleted by mistake
+volumeBindingMode: WaitForFirstConsumer

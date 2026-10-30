@@ -1,0 +1,48 @@
+{
+  "description": "Runs on every log line before it is stored, so all sources share the same fields. Managed by observability-platform/install/logging/es-setup.",
+  "processors": [
+    {
+      "lowercase": {
+        "field": "level",
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "description": "Common spellings of the level become debug/info/warn/error/fatal.",
+        "lang": "painless",
+        "if": "ctx.level instanceof String",
+        "source": "Map m = ['warning':'warn', 'err':'error', 'crit':'fatal', 'critical':'fatal', 'panic':'fatal', 'dbg':'debug', 'information':'info', 'notice':'info']; if (m.containsKey(ctx.level)) { ctx.level = m.get(ctx.level); }",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "description": "Apps that log `msg` instead of `message`.",
+        "field": "message",
+        "copy_from": "msg",
+        "if": "ctx.message == null && ctx.msg != null",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "description": "Kubernetes: service = the pod's app label.",
+        "field": "service",
+        "copy_from": "kubernetes.labels.app",
+        "if": "ctx.service == null && ctx.kubernetes?.labels?.app != null",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "description": "Kubernetes pods without an app label: service = container name.",
+        "field": "service",
+        "copy_from": "kubernetes.container_name",
+        "if": "ctx.service == null && ctx.kubernetes?.container_name != null",
+        "ignore_failure": true
+      }
+    }
+  ]
+}

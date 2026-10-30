@@ -1,0 +1,7 @@
+# One file per Kubernetes cluster: integrations/<project>/clusters/<cluster>.yaml
+# The file name and `cluster` are the cluster's name as registered in ArgoCD. Must be unique across all
+# projects and never reused.
+identity:
+  project: myproject
+  cluster: CLUSTER_NAME
+  env: dev                    # dev | staging | prod

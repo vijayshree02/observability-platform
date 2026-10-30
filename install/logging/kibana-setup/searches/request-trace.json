@@ -1,0 +1,18 @@
+{
+  "attributes": {
+    "title": "All projects: request trace",
+    "description": "Follow one request across pods, services, clusters and projects: replace the id in the search bar.",
+    "columns": ["project", "cluster", "service", "kubernetes.pod_name", "level", "message", "request_id"],
+    "sort": [["@timestamp", "asc"]],
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"query\":\"request_id:\\\"paste-request-id-here\\\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "logs-all"
+    }
+  ]
+}

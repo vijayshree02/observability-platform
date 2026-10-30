@@ -1,0 +1,21 @@
+{
+  "uid": "logs-elasticsearch",
+  "name": "Logs (Elasticsearch)",
+  "type": "elasticsearch",
+  "access": "proxy",
+  "url": "__ES_URL__",
+  "basicAuth": true,
+  "basicAuthUser": "grafana",
+  "jsonData": {
+    "index": "logs-*",
+    "timeField": "@timestamp",
+    "logMessageField": "message",
+    "logLevelField": "level",
+    "maxConcurrentShardRequests": 5,
+    "tlsAuthWithCACert": true
+  },
+  "secureJsonData": {
+    "basicAuthPassword": "__PASSWORD__",
+    "tlsCACert": "__CA_CERT__"
+  }
+}

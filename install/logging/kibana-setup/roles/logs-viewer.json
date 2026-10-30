@@ -1,0 +1,17 @@
+{
+  "description": "Read-only Kibana access to __NAME__ logs. Assign to that team's users.",
+  "elasticsearch": {
+    "indices": [
+      {
+        "names": ["__INDEX__"],
+        "privileges": ["read", "view_index_metadata"]
+      }
+    ]
+  },
+  "kibana": [
+    {
+      "base": ["read"],
+      "spaces": ["*"]
+    }
+  ]
+}

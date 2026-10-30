@@ -1,0 +1,57 @@
+# Lets the kube-prometheus-stack Prometheus (release "prometheus", namespace "monitoring") scrape Replaice
+# Desk the same way it scrapes the tribe services: through a ServiceMonitor, over the private network.
+#
+# Replaice Desk runs on its own server, not in the cluster, so instead of selecting pods the Service has
+# no selector and the Endpoints object below points it at the server's private IP. To Prometheus it is
+# then an ordinary service; the job label is "replaice-desk".
+#
+#   1. Replace DESK_PRIVATE_IP with the server's private IP (METRICS_BIND_IP in /opt/replaicedesk/.env).
+#   2. Allow TCP 9100 from the cluster's VPC range in the server's security group.
+#   3. kubectl apply -f servicemonitor.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: replaice-desk
+  namespace: monitoring
+  labels:
+    app: replaice-desk
+spec:
+  clusterIP: None
+  ports:
+    - name: metrics
+      port: 9100
+      targetPort: 9100
+      protocol: TCP
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: replaice-desk
+  namespace: monitoring
+  labels:
+    app: replaice-desk
+subsets:
+  - addresses:
+      - ip: DESK_PRIVATE_IP
+    ports:
+      - name: metrics
+        port: 9100
+        protocol: TCP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: replaice-desk
+  namespace: monitoring
+  labels:
+    app: replaice-desk
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: replaice-desk
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
