@@ -1,0 +1,13 @@
+# Secrets never go in git.
+*.env
+.env*
+secrets/
+*.key
+*.pem
+*-secret.yaml
+
+# Local tooling and editors
+.vscode/
+.idea/
+*.swp
+.DS_Store
